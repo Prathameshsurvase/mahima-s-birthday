@@ -41,7 +41,7 @@ export default function SecretLetterSection({ gfName }) {
 
     // Any other incorrect password
     sound.playBoing();
-    setErrorMessage('Incorrect password silly! Hint: Password is my phone password 🙈🔑');
+    setErrorMessage('Incorrect password! Try again 🙈');
     triggerShake();
   };
 
@@ -181,26 +181,28 @@ export default function SecretLetterSection({ gfName }) {
               </h3>
 
               {/* Password Clue / Label */}
-              <div
+              <label
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                   background: '#fff2f5',
-                  border: '1px dashed #f6ccd5',
-                  padding: '6px 14px',
+                  border: '1.5px solid #f6ccd5',
+                  padding: '8px 18px',
                   borderRadius: '999px',
                   fontSize: '13px',
                   fontFamily: 'var(--font-sans)',
-                  fontWeight: 700,
-                  color: '#c9182b',
-                  marginBottom: '24px'
+                  fontWeight: 800,
+                  color: '#780d21',
+                  letterSpacing: '0.5px',
+                  marginBottom: '20px',
+                  textTransform: 'uppercase'
                 }}
               >
                 <span>📱</span>
-                <span>Password is phone password</span>
+                <span>PASSWORD IS PHONE PASSWORD</span>
                 <span>🔐</span>
-              </div>
+              </label>
 
               {/* Password Input Form */}
               <form onSubmit={handleUnlock} style={{ maxWidth: '340px', margin: '0 auto' }}>
@@ -400,7 +402,11 @@ export default function SecretLetterSection({ gfName }) {
                 }}
               >
                 <p style={{ marginBottom: '16px' }}>
-                  Happy 22nd Birthday to the girl who made my whole world softer, brighter, and infinitely more beautiful. 🎂✨
+                  Happy 25th Birthday to the girl who made my whole world softer, brighter, and infinitely more beautiful. 🎂✨
+                </p>
+
+                <p style={{ marginBottom: '16px', color: '#780d21', fontWeight: 600 }}>
+                  First of all, I am so sorry that I am not with you on your birthday today. It breaks my heart that I cannot be right beside you to hug you tight, celebrate together, and see your gorgeous smile in person. But please remember, distance can never change how deeply I love you — every second today, my whole mind and heart are celebrating you.
                 </p>
 
                 <p style={{ marginBottom: '16px' }}>
@@ -408,11 +414,11 @@ export default function SecretLetterSection({ gfName }) {
                 </p>
 
                 <p style={{ marginBottom: '16px' }}>
-                  You are funny, ridiculously cute, endlessly caring, and somehow you manage to get more gorgeous every single day. I created this entire surprise website just to see that magical smile on your face today.
+                  You are funny, ridiculously cute, endlessly caring, and somehow you manage to get more gorgeous every single day. I created this entire surprise website just to make you feel as special and loved as you truly are.
                 </p>
 
                 <p style={{ marginBottom: '24px' }}>
-                  May this year bring you all the warmth, happiness, and big dreams you truly deserve. I promise to always be here cheering you on, stealing bites of your treats, loving you through every mood, and holding your hand through it all.
+                  May this 25th year bring you all the warmth, boundless happiness, and every dream your heart desires. I promise to always be here cheering you on, stealing bites of your treats, loving you through every mood, and holding your hand through it all.
                 </p>
 
                 <p style={{ fontFamily: 'var(--font-love)', fontSize: '26px', color: '#c9182b', fontWeight: 700 }}>
@@ -485,3 +491,4 @@ export default function SecretLetterSection({ gfName }) {
     </section>
   );
 }
+
