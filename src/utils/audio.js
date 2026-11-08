@@ -190,6 +190,7 @@ class SoundEngine {
   }
 
   startMusicBox(onTick) {
+    if (this.isPlayingMusic) return;
     this.init();
     if (!this.ctx) return;
     this.isPlayingMusic = true;

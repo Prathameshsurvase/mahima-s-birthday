@@ -88,7 +88,11 @@ export default function App() {
         {showLoader && (
           <LoaderScreen
             gfName={gfName}
-            onComplete={() => setShowLoader(false)}
+            setIsMusicPlaying={setIsMusicPlaying}
+            onComplete={() => {
+              setIsMusicPlaying(true);
+              setShowLoader(false);
+            }}
           />
         )}
       </AnimatePresence>

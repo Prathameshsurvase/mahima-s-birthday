@@ -3,244 +3,357 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { sound } from '../utils/audio';
 
-export default function LoaderScreen({ onComplete, gfName }) {
-  const [progress, setProgress] = useState(0);
-  const [phaseIndex, setPhaseIndex] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
+export default function LoaderScreen({ onComplete, gfName, setIsMusicPlaying }) {
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [audioStarted, setAudioStarted] = useState(false);
 
-  const phases = [
-    { text: "Baking sweetest birthday memories... 🍰", emoji: "🍰" },
-    { text: "Wrapping custom candies with extra love... 🍬", emoji: "🍬" },
-    { text: "Tuning the nostalgic birthday music box... 🎶", emoji: "🎶" },
-    { text: "Sprinkling stardust & warm hugs... ✨", emoji: "✨" },
-    { text: `Surprise ready for ${gfName || 'My Princess'}! 💖`, emoji: "🎀" }
-  ];
-
+  // Attempt automatic music playback as soon as the site opens
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          return 100;
+    const startAudio = () => {
+      try {
+        sound.init();
+        if (!sound.isPlayingMusic) {
+          sound.startMusicBox();
+          if (setIsMusicPlaying) setIsMusicPlaying(true);
+          setAudioStarted(true);
         }
-        // Smooth random increment
-        const increment = Math.floor(Math.random() * 4) + 2;
-        const next = Math.min(prev + increment, 100);
+      } catch (e) {
+        console.log('Audio autoplay blocked by browser policy:', e);
+      }
+    };
 
-        // Update phase text based on percentage
-        if (next < 25) setPhaseIndex(0);
-        else if (next < 50) setPhaseIndex(1);
-        else if (next < 75) setPhaseIndex(2);
-        else if (next < 98) setPhaseIndex(3);
-        else setPhaseIndex(4);
+    // Try autoplay immediately
+    startAudio();
 
-        return next;
-      });
-    }, 45);
+    // Fallback: unlock audio on the very first touch/click anywhere on screen
+    const unlockOnGesture = () => {
+      startAudio();
+      setHasInteracted(true);
+    };
 
-    return () => clearInterval(timer);
-  }, [gfName]);
+    window.addEventListener('click', unlockOnGesture, { once: true });
+    window.addEventListener('touchstart', unlockOnGesture, { once: true });
 
-  useEffect(() => {
-    if (progress === 100 && !isFinished) {
-      sound.playSparkle();
-      const finishTimeout = setTimeout(() => {
-        setIsFinished(true);
-      }, 500);
-      return () => clearTimeout(finishTimeout);
-    }
-  }, [progress, isFinished]);
+    return () => {
+      window.removeEventListener('click', unlockOnGesture);
+      window.removeEventListener('touchstart', unlockOnGesture);
+    };
+  }, [setIsMusicPlaying]);
 
+  // When clicking the CTA to Enter
   const handleEnter = () => {
+    sound.init();
+    if (!sound.isPlayingMusic) {
+      sound.startMusicBox();
+      if (setIsMusicPlaying) setIsMusicPlaying(true);
+    }
     sound.playSparkle();
+
+    // Celebratory confetti burst
     confetti({
-      particleCount: 80,
+      particleCount: 90,
       spread: 80,
       origin: { y: 0.6 },
-      colors: ['#c9182b', '#7b0f24', '#fcecef', '#fbd5c5', '#c4d4f8']
+      colors: ['#c9182b', '#7b0f24', '#ff758c', '#ffd700', '#ffffff', '#fad5df']
     });
-    if (onComplete) onComplete();
+
+    if (onComplete) {
+      onComplete();
+    }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 1.04 }}
-      transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+      initial={{ y: 0 }}
+      exit={{
+        y: '-100%',
+        transition: {
+          duration: 0.95,
+          ease: [0.76, 0, 0.24, 1] // Smooth window blind / curtain opening upward
+        }
+      }}
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 999999,
-        backgroundColor: '#fdfbf7',
+        background: 'radial-gradient(ellipse at 50% 35%, #fff5f7 0%, #fbe7ed 55%, #f6ced8 100%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px',
-        overflow: 'hidden'
+        padding: '24px 20px',
+        overflow: 'hidden',
+        boxShadow: '0 30px 60px rgba(88, 8, 24, 0.45)'
       }}
     >
-      {/* Decorative Corner Ribbons / Stickers */}
-      <div style={{ position: 'absolute', top: '24px', left: '28px', color: '#7b0f24', fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
-        ( SPECIAL BIRTHDAY EDITION )
-      </div>
-      <div style={{ position: 'absolute', top: '24px', right: '28px', color: '#7b0f24', fontSize: '20px' }}>
-        🍒
+      {/* Decorative Vintage Ribbon Header */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '0 28px',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '12px',
+          fontWeight: 800,
+          letterSpacing: '2px',
+          color: '#7b0f24',
+          textTransform: 'uppercase'
+        }}
+      >
+        <span>🎀 SPECIAL CELEBRATION</span>
+        <span>FOR {gfName ? gfName.toUpperCase() : 'MAHIMA'} 🍒</span>
       </div>
 
-      <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center' }}>
-        {/* Animated Swedish Candy Cart / Birthday Gift Icon */}
-        <motion.div
-          animate={{
-            y: [0, -10, 0],
-            rotate: [0, -2, 2, 0]
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 2.4,
-            ease: "easeInOut"
-          }}
-          style={{
-            width: '120px',
-            height: '120px',
-            margin: '0 auto 24px auto',
-            background: 'radial-gradient(circle, #fcecef 60%, #fad5df 100%)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 10px 28px rgba(123, 15, 36, 0.12)',
-            border: '3px solid #ffffff',
-            position: 'relative'
-          }}
-        >
-          <span style={{ fontSize: '56px', userSelect: 'none' }}>
-            {phases[phaseIndex].emoji}
-          </span>
-          <motion.span
-            animate={{ scale: [1, 1.25, 1], rotate: [0, 15, -15, 0] }}
-            transition={{ repeat: Infinity, duration: 1.8 }}
-            style={{ position: 'absolute', top: '-6px', right: '-4px', fontSize: '24px' }}
+      {/* Floating Sparkles in the background */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        {[
+          { top: '15%', left: '10%', size: '20px', delay: 0 },
+          { top: '22%', right: '12%', size: '24px', delay: 0.5 },
+          { top: '65%', left: '8%', size: '18px', delay: 1 },
+          { top: '70%', right: '10%', size: '22px', delay: 1.5 },
+          { top: '40%', left: '88%', size: '16px', delay: 0.8 },
+          { top: '50%', left: '5%', size: '16px', delay: 1.2 }
+        ].map((item, idx) => (
+          <motion.div
+            key={idx}
+            animate={{
+              y: [0, -14, 0],
+              opacity: [0.35, 0.85, 0.35],
+              scale: [0.9, 1.2, 0.9]
+            }}
+            transition={{
+              repeat: Infinity,
+              duration: 2.8,
+              delay: item.delay,
+              ease: 'easeInOut'
+            }}
+            style={{
+              position: 'absolute',
+              top: item.top,
+              left: item.left,
+              right: item.right,
+              fontSize: item.size,
+              userSelect: 'none'
+            }}
           >
             ✨
-          </motion.span>
-        </motion.div>
+          </motion.div>
+        ))}
+      </div>
 
-        {/* Vintage Candy Boutique Title */}
-        <h2
-          style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(28px, 5vw, 36px)',
-            color: '#7b0f24',
-            fontWeight: 500,
-            marginBottom: '6px',
-            letterSpacing: '-0.01em'
+      {/* Center Card Content */}
+      <div
+        style={{
+          maxWidth: '520px',
+          width: '100%',
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 2
+        }}
+      >
+        {/* Real Birthday Cake with Candle Glow */}
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{
+            scale: 1,
+            opacity: 1,
+            y: [0, -8, 0]
           }}
-        >
-          sweetheart
-        </h2>
-        <p
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '13px',
-            fontWeight: 700,
-            letterSpacing: '2.5px',
-            textTransform: 'uppercase',
-            color: '#c9182b',
-            marginBottom: '32px'
+          transition={{
+            scale: { duration: 0.7, ease: 'easeOut' },
+            opacity: { duration: 0.7 },
+            y: { repeat: Infinity, duration: 3.2, ease: 'easeInOut' }
           }}
-        >
-          THE SWEETEST CELEBRATION CART
-        </p>
-
-        {/* Progress Bar Container */}
-        <div
           style={{
-            width: '100%',
-            height: '16px',
-            backgroundColor: '#f5e8eb',
-            borderRadius: '999px',
-            overflow: 'hidden',
             position: 'relative',
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06)',
-            marginBottom: '16px',
-            border: '1.5px solid #fad5df'
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '8px'
           }}
         >
+          {/* Warm Candle Light Radial Glow behind cake */}
           <motion.div
+            animate={{
+              scale: [1, 1.15, 1],
+              opacity: [0.65, 0.95, 0.65]
+            }}
+            transition={{
+              repeat: Infinity,
+              duration: 1.8,
+              ease: 'easeInOut'
+            }}
             style={{
-              height: '100%',
-              backgroundColor: '#c9182b',
-              borderRadius: '999px',
-              width: `${progress}%`,
-              transition: 'width 0.1s linear'
+              position: 'absolute',
+              top: '15%',
+              width: '260px',
+              height: '200px',
+              background: 'radial-gradient(circle, rgba(255, 195, 110, 0.55) 0%, rgba(255, 130, 80, 0.22) 50%, transparent 75%)',
+              borderRadius: '50%',
+              filter: 'blur(16px)',
+              pointerEvents: 'none'
             }}
           />
-        </div>
 
-        {/* Percentage Counter and Current Phase */}
-        <div
+          {/* Birthday Cake Image */}
+          <img
+            src="./assets/images/birthday_cake_real.png"
+            alt="Happy Birthday Cake"
+            style={{
+              width: '100%',
+              maxWidth: 'min(300px, 72vw)',
+              height: 'auto',
+              maxHeight: '270px',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 16px 28px rgba(120, 13, 33, 0.28))',
+              position: 'relative',
+              zIndex: 1,
+              userSelect: 'none',
+              pointerEvents: 'none'
+            }}
+          />
+        </motion.div>
+
+        {/* Big Bold Typography: HAPPY BIRTHDAY */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <h1
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(38px, 9vw, 66px)',
+              fontWeight: 900,
+              color: '#780d21',
+              letterSpacing: '0.01em',
+              lineHeight: 1.05,
+              textTransform: 'uppercase',
+              margin: '6px 0 2px 0',
+              textShadow: '0 3px 12px rgba(120, 13, 33, 0.16)'
+            }}
+          >
+            HAPPY BIRTHDAY
+          </h1>
+
+          <h2
+            style={{
+              fontFamily: 'var(--font-love)',
+              fontSize: 'clamp(32px, 7.5vw, 50px)',
+              fontWeight: 700,
+              color: '#c9182b',
+              margin: '0 0 10px 0',
+              lineHeight: 1.15
+            }}
+          >
+            {gfName || 'Mahima'} 💖✨
+          </h2>
+
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'clamp(14px, 3.2vw, 16px)',
+              fontWeight: 500,
+              color: '#7d3e4d',
+              maxWidth: '400px',
+              margin: '0 auto 24px auto',
+              lineHeight: 1.45
+            }}
+          >
+            A magical birthday boutique made just for you, filled with our sweetest memories! 🍰
+          </p>
+        </motion.div>
+
+        {/* CTA to Enter the Website */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+        >
+          <motion.button
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.95 }}
+            animate={{
+              boxShadow: [
+                '0 8px 24px rgba(120, 13, 33, 0.28)',
+                '0 14px 36px rgba(201, 24, 43, 0.48)',
+                '0 8px 24px rgba(120, 13, 33, 0.28)'
+              ]
+            }}
+            transition={{
+              repeat: Infinity,
+              duration: 2.2,
+              ease: 'easeInOut'
+            }}
+            onClick={handleEnter}
+            style={{
+              background: 'linear-gradient(135deg, #c9182b 0%, #780d21 100%)',
+              color: '#ffffff',
+              border: '2px solid rgba(255, 255, 255, 0.85)',
+              borderRadius: '999px',
+              padding: '16px 42px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'clamp(16px, 4vw, 19px)',
+              fontWeight: 800,
+              letterSpacing: '1px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              userSelect: 'none'
+            }}
+          >
+            <span>ENTER CELEBRATION</span>
+            <span>🎀</span>
+          </motion.button>
+        </motion.div>
+
+        {/* Audio / Music Playing Status */}
+        <motion.div
+          animate={{ opacity: [0.75, 1, 0.75] }}
+          transition={{ repeat: Infinity, duration: 2 }}
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
+            marginTop: '18px',
+            display: 'inline-flex',
             alignItems: 'center',
-            marginBottom: '20px',
+            gap: '8px',
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(4px)',
+            padding: '6px 14px',
+            borderRadius: '999px',
+            border: '1px solid #fad5df',
+            fontSize: '12px',
             fontFamily: 'var(--font-sans)',
-            fontSize: '14px',
-            fontWeight: 600,
-            color: '#7b0f24'
+            fontWeight: 700,
+            color: '#780d21'
           }}
         >
-          <span>{progress}% Loaded</span>
-          <span style={{ fontSize: '13px', color: '#c9182b' }}>
-            {progress === 100 ? "Ready to unwrap!" : "Almost there..."}
-          </span>
-        </div>
-
-        {/* Dynamic Status Text with Smooth Transitions */}
-        <div style={{ minHeight: '36px' }}>
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={phaseIndex}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-              style={{
-                fontFamily: 'var(--font-note)',
-                fontSize: '20px',
-                color: '#580818'
-              }}
-            >
-              {phases[phaseIndex].text}
-            </motion.p>
-          </AnimatePresence>
-        </div>
-
-        {/* Enter Celebration Button when 100% */}
-        <div style={{ marginTop: '28px', minHeight: '52px' }}>
-          <AnimatePresence>
-            {progress >= 100 && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleEnter}
-                className="retro-pill-btn retro-pill-bordeaux"
-                style={{
-                  fontSize: '16px',
-                  padding: '14px 34px',
-                  boxShadow: '0 8px 24px rgba(123, 15, 36, 0.25)'
-                }}
-              >
-                OPEN CELEBRATION 🎀
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </div>
+          <span>🎶</span>
+          <span>Happy Birthday Melody Playing · Tap to Open</span>
+          <span>✨</span>
+        </motion.div>
       </div>
+
+      {/* Bottom Scallop / Window Shade Edge */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '14px',
+          background: 'linear-gradient(to bottom, transparent, rgba(120, 13, 33, 0.12))',
+          pointerEvents: 'none'
+        }}
+      />
     </motion.div>
   );
 }
