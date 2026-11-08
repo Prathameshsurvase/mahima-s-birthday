@@ -431,6 +431,121 @@ export default function SecretLetterSection({ gfName }) {
                 </p>
               </div>
 
+              {/* Pinned Polaroids of Us Together inside the Letter */}
+              <div style={{ marginTop: '28px', marginBottom: '16px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '14px',
+                    fontFamily: 'var(--font-love)',
+                    fontSize: '22px',
+                    color: '#780d21',
+                    fontWeight: 700
+                  }}
+                >
+                  <span>📸</span>
+                  <span>Our Favorite Moments Together ✨</span>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                    gap: '14px',
+                    position: 'relative'
+                  }}
+                >
+                  {[
+                    {
+                      src: './assets/images/us_memory_01.jpg',
+                      caption: 'Our goofy side 😂💖',
+                      tilt: -2
+                    },
+                    {
+                      src: './assets/images/us_memory_02.jpg',
+                      caption: 'My favorite person 🌸',
+                      tilt: 2
+                    },
+                    {
+                      src: './assets/images/us_memory_03.jpg',
+                      caption: 'Matching your smile ✨',
+                      tilt: -1.5
+                    },
+                    {
+                      src: './assets/images/us_memory_04.jpg',
+                      caption: 'Always right with you ❤️',
+                      tilt: 2.5
+                    }
+                  ].map((photo, pIdx) => (
+                    <motion.div
+                      key={pIdx}
+                      whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
+                      style={{
+                        backgroundColor: '#ffffff',
+                        padding: '8px 8px 12px 8px',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 18px rgba(120, 13, 33, 0.12)',
+                        border: '1px solid #fad5df',
+                        transform: `rotate(${photo.tilt}deg)`,
+                        position: 'relative',
+                        transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                      }}
+                    >
+                      {/* Cute Washi Tape on each polaroid */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: '45px',
+                          height: '14px',
+                          backgroundColor: 'rgba(250, 213, 223, 0.85)',
+                          borderRadius: '2px',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+                        }}
+                      />
+                      <div
+                        style={{
+                          width: '100%',
+                          aspectRatio: '4 / 5',
+                          overflow: 'hidden',
+                          borderRadius: '8px',
+                          marginBottom: '8px',
+                          backgroundColor: '#f5e8eb'
+                        }}
+                      >
+                        <img
+                          src={photo.src}
+                          alt={photo.caption}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            display: 'block'
+                          }}
+                        />
+                      </div>
+                      <p
+                        style={{
+                          fontFamily: 'var(--font-note)',
+                          fontSize: '13px',
+                          color: '#780d21',
+                          textAlign: 'center',
+                          margin: 0,
+                          lineHeight: 1.2,
+                          fontWeight: 600
+                        }}
+                      >
+                        {photo.caption}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
               {/* Bottom Actions inside the Letter */}
               <div
                 style={{
