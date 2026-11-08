@@ -8,6 +8,7 @@ import HeroEnvelope from './components/HeroEnvelope';
 import PhotoboothSection from './components/PhotoboothSection';
 import PinkStripedSection from './components/PinkStripedSection';
 import DateInviteSection from './components/DateInviteSection';
+import SecretLetterSection from './components/SecretLetterSection';
 import PersonalizerModal from './components/PersonalizerModal';
 import { sound } from './utils/audio';
 
@@ -131,6 +132,9 @@ export default function App() {
         gfName={gfName}
         dateLocation={dateLocation}
       />
+
+      {/* STAGE 5: Secret Personal Love Letter (Locked with Passcode 7550) */}
+      <SecretLetterSection gfName={gfName} />
 
       {/* Sweet Boutique Editorial Footer */}
       <footer

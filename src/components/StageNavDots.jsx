@@ -8,7 +8,8 @@ export default function StageNavDots() {
     { id: 'section-hero', title: 'The Candy Cart 🍒' },
     { id: 'section-calendar', title: 'Photobooth Memories 📸' },
     { id: 'section-treats', title: 'Storybook Album 📖' },
-    { id: 'section-vip-pass', title: 'VIP Date Night 🎟️' }
+    { id: 'section-vip-pass', title: 'VIP Date Night 🎟️' },
+    { id: 'section-secret-letter', title: 'Secret Love Letter 💌' }
   ];
 
   useEffect(() => {
